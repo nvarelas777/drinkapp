@@ -1,55 +1,94 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import Form from 'react-bootstrap/Form'
+import Col from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
+import Container from 'react-bootstrap/Container'
+import styled from 'styled-components'
 
 export default class Login extends Component {
 
     constructor(props) {
         super(props);
-        this.state= {
+        this.state = {
             email: '',
-            password: ''
+            password: '',
+            isWrong: false
         }
     }
 
-    handleChange = (e) => {
-        const { value, name } = e.target;
+    handleEmailChange = (e) => {
         this.setState({
-            [name]: value
+            isWrong: false,
+            email: e.target.value
+        });
+    }
+
+    handlePasswordChange = (e) => {
+        this.setState({
+            isWrong: false,
+            password: e.target.value
         });
     }
 
     onSubmit = (e) => {
         e.preventDefault();
-        axios('http://localhost:4000/drinks/api/authenticate', {
+        axios.defaults.withCredentials = true;
+        axios('http://localhost:4000/api/authenticate', {
+            withCredentials: true,
             method: 'POST',
-            data: this.state,
+            data: { email: this.state.email, password: this.state.password },
             headers: {
-              'Content-Type': 'application/json'
+                'Content-Type': 'application/json'
             }
-          })
-          .then(res => {
-            if (res.status === 200) {
-              this.props.history.push('/cocktail/5cf06fe9e87087381cbe28c2');
-            } else {
-              const error = new Error(res.error);
-              throw error;
-            }
-          })
-          .catch(err => {
-            console.error(err);
-            //alert('Error logging in please try again');
-          });
+        })
+            .then(res => {
+                if (res.status === 200) {
+                    this.props.location.onGreet();
+                    this.props.history.push('/');
+                } else {
+                    const error = new Error(res.error);
+                    throw error;
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                this.setState({
+                    isWrong: true
+                })
+            });
     }
 
-    render(){
+    render() {
         return (
-            <form onSubmit={this.onSubmit}>
-                <h1> Login Page </h1>
-                <input type="email" value={this.state.email} name="email" placeholder="email" onChange={this.handleChange} />
-                <input type="password" value={this.state.password} name="password" placeholder="password" onChange={this.handleChange} />
-                <input type="submit" value="Submit" />
-            </form>
+            <ContainerStyled>
+            <Col sm={{offset: 4, span: 4}}>
+                <FormStyled onSubmit={this.onSubmit}>
+                    <Form.Group>
+                        <Form.Label>Email</Form.Label>
+                        <Form.Control onChange={this.handleEmailChange}></Form.Control>
+                    </Form.Group>
+                    <Form.Group>
+                        <Form.Label>Password</Form.Label>
+                        <Form.Control onChange={this.handlePasswordChange}></Form.Control>
+                    </Form.Group>
+                    <Form.Control type="submit" value="Submit" />
+                </FormStyled>
+                {this.state.isWrong === true ? <p>wrong password</p> : <p></p>}
+            </Col>
+            </ContainerStyled>
         )
     }
 }
 
+const ContainerStyled = styled(Container)`
+    margin-bottom:0;
+    padding-bottom: 2em;
+`
+
+const FormStyled = styled(Form)`
+    border: 2px solid black;
+    padding: 1em;
+    border-radius:8px;
+    background-color: #abeaff;
+    `

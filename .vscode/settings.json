@@ -1,0 +1,6 @@
+{   
+    "files.associations": {
+        "**/drink-app/src/*/*.js": "javascriptreact",
+        "**/drink-app/src/*.js": "javascriptreact"
+    },  
+}

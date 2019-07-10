@@ -1,13 +1,19 @@
-import React , { Component } from 'react';
+import React, { Component } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom';
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import Table from 'react-bootstrap/Table';
+import styled from 'styled-components';
+
 
 const Drink = props => (
-    <tr>
+    <TableRowStyled>
         <td>
-           <Link to={"/cocktail/"+props.drink._id}>{props.drink.drink_name}</Link>
+            <Link to={"/cocktail/" + props.drink._id}>{props.drink.drink_name}</Link>
         </td>
-    </tr>
+    </TableRowStyled >
 )
 
 export default class Ingredients extends Component {
@@ -20,55 +26,49 @@ export default class Ingredients extends Component {
         this.state = {
             drinks: [],
             drink_name: '',
-            drink_base_ingredient: '',
-            drink_ingredient: [],
+            drink_special_instructions: '',
+            drink_liquors: [],
+            drink_ingredients: [],
             drink_alternate_name: '',
+            drink_glass: ''
         }
     }
 
-    drinkList(){
-        return this.state.drinks.map(function(currentDrink, i) {
+    drinkList() {
+        return this.state.drinks.map(function (currentDrink, i) {
             return <Drink drink={currentDrink} key={i} />
         });
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         this.mounted = true;
 
-        axios.get('http://localhost:4000/drinks/byid/'+this.props.match.params.id)
-            .then(res => {
-                this.setState({
-                    drink_name: res.data.drink_name,
-                    drink_base_ingredient: res.data.drink_base_ingredient,
-                    drink_ingredient: res.data.drink_ingredient,
-                    drink_alternate_name: res.data.drink_alternate_name,
-                })
-            })
-            .catch(err => {
-                console.log(err);
-            })      
+        const [firstRes, secondRes] = await Promise.all([
+            axios.get('http://localhost:4000/byid/' + this.props.match.params.id),
+            axios.get('http://localhost:4000/')
+        ])
 
-        axios.get('http://localhost:4000/drinks/')
-            .then(res => {
-                this.setState({
-                    drinks: res.data
-                })
-            })
-            .catch(err => {
-                console.log(err)
-            })
+        this.setState({
+            drink_name: firstRes.data.drink_name,
+            drink_liquors: firstRes.data.drink_liquors,
+            drink_ingredients: firstRes.data.drink_ingredients,
+            drink_special_instructions: firstRes.data.drink_special_instructions,
+            drink_glass: firstRes.data.drink_glass,
+            drinks: secondRes.data
+        })
     }
 
     componentDidUpdate(prevProps) {
         if (this.props.match.params.id !== prevProps.match.params.id) {
-            axios.get('http://localhost:4000/drinks/byid/' + this.props.match.params.id)
+            axios.get('http://localhost:4000/byid/' + this.props.match.params.id)
                 .then(res => {
                     if (this.mounted) {
                         this.setState({
                             drink_name: res.data.drink_name,
-                            drink_base_ingredient: res.data.drink_base_ingredient,
-                            drink_ingredient: res.data.drink_ingredient,
+                            drink_liquors: res.data.drink_liquors,
+                            drink_ingredients: res.data.drink_ingredients,
                             drink_alternate_name: res.data.drink_alternate_name,
+                            drink_glass: res.data.drink_glass
                         })
                     }
                 })
@@ -78,45 +78,71 @@ export default class Ingredients extends Component {
         }
     }
 
-    componentWillUnmount(){
+    componentWillUnmount() {
         this.mounted = false;
     }
 
     render() {
         return (
-            <div className="container">
+            <Container>
                 <h1>{this.state.drink_name}</h1>
-                <div className="row">
-                    <div className="col-sm-4">
-                        <h3>Ingredients</h3>
-                        <p>{this.renderIngredients()}</p>
-                    </div>
-                    <div className="col-sm-4">
-                        <h3>Special Instructions</h3>
-                        <p>{this.state.drink_alternate_name}</p>
-                    </div>
-                    <table className="col-sm-4 table">                        
-                        <thead>
-                            <tr>
-                                <th>Similar Drinks</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {this.drinkList()}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                <Row>
+                    <Col sm={8}>
+                        <Row>
+                            <Col sm={6} xs={6}>
+                                <h3>Ingredients</h3>
+                                <p>{this.renderIngredients()}</p>
+                            </Col>
+                            <Col sm={6} xs={6}>
+                                <h3>Special Instructions</h3>
+                                <p>{this.state.drink_special_instructions}</p>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col sm={6}>
+                                <h3>Glass Type</h3>
+                                <p>{this.state.drink_glass}</p>
+                            </Col>
+                        </Row>
+                    </Col>
+                    <Col sm={4}>
+                        <Table borderless>
+                            <thead>
+                                <TableRowHeadStyled>
+                                    <th>Similar Drinks</th>
+                                </TableRowHeadStyled>
+                            </thead>
+                            <TableBodyStyled>
+                                {this.drinkList()}
+                            </TableBodyStyled>
+                        </Table>
+                    </Col>
+                </Row>
+            </Container >
         )
     }
 
     renderIngredients() {
-        return this.state.drink_ingredient.map((ingredient, i) => {
+        return this.state.drink_ingredients.map((ingredient, i) => {
             return (
                 <li key={i}>
-                    {ingredient.ingredient_amount + " oz " + ingredient.ingredient_name}
+                    {ingredient}
                 </li>
             )
         })
     }
 }
+
+
+const TableBodyStyled = styled.tbody`
+    background-color: #abeaff;
+    border: 2px solid black;
+`;
+
+const TableRowStyled = styled.tr`
+    border: 2px solid black;
+`;
+
+const TableRowHeadStyled = styled.tr`
+    border-bottom: 2px solid black;
+`;

@@ -10,8 +10,8 @@ export default class Search extends Component {
             searchParams: '',
             value: '',
             drink_name: '',
-            drink_base_ingredient: '',
-            drink_ingredient: [],
+            drink_liquors: [],
+            drink_ingredients: [],
             drink_alternate_name: '',
         }
     }
@@ -23,12 +23,12 @@ export default class Search extends Component {
             console.log(myKey);
         }
         
-        axios.get('http://localhost:4000/drinks/'+this.props.match.params.id)
+        axios.get('http://localhost:4000/'+this.props.match.params.id)
             .then(res => {
                 this.setState({
                 drink_name: res.data.drink_name,
-                drink_base_ingredient: res.data.drink_base_ingredient,
-                drink_ingredient: res.data.drink_ingredient,
+                drink_liquors: res.data.drink_liquors,
+                drink_ingredients: res.data.drink_ingredients,
                 drink_alternate_name: res.data.drink_alternate_name,
                 })
             })
@@ -41,12 +41,12 @@ export default class Search extends Component {
 
     componentDidUpdate(prevProps) {
         if (this.props.match.params.id !== prevProps.match.params.id) {
-            axios.get('http://localhost:4000/drinks/'+this.props.match.params.id)
+            axios.get('http://localhost:4000/'+this.props.match.params.id)
             .then(res => {
                 this.setState({
                 drink_name: res.data.drink_name,
-                drink_base_ingredient: res.data.drink_base_ingredient,
-                drink_ingredient: res.data.drink_ingredient,
+                drink_liquors: res.data.drink_liquors,
+                drink_ingredients: res.data.drink_ingredients,
                 drink_alternate_name: res.data.drink_alternate_name,
                 })
             })
@@ -64,7 +64,7 @@ export default class Search extends Component {
                 <h1> Results </h1>
                 <h2>drink name:  {this.props.match.params.id}</h2>
                 <h2>drink state:  {this.state.drink_name}</h2>
-                <h2>drink_base_ingredient: {this.state.drink_base_ingredient} </h2>
+                <h2>drink_liquors: {this.state.drink_liquors} </h2>
             </div>
         )
     }

@@ -10,29 +10,38 @@ require('dotenv').config();
 const secret = process.env.DB_TOKEN;
 const withAuth = require('./middleware');
 app.use(cookieParser());
-
-const drinkRoutes = express.Router();
+app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
+app.use(bodyParser.json());
+//const drinkRoutes = express.Router();
 
 
 //var models = require('./Schema');
 var Drink  = require('./Schema');
 var User = require('./models/users');
 
-app.use(cors());
-app.use(bodyParser.json());
-app.use('/drinks', drinkRoutes);
+//app.use('/drinks', drinkRoutes);
 
+var uri = process.env.MONGO_URI;
 
-mongoose.connect('mongodb://127.0.0.1:27017/drinks', { useNewUrlParser: true });
+mongoose.connect(uri, { useNewUrlParser: true });
+
 const connection = mongoose.connection;
 
 connection.once('open', function() {
     console.log('Mongoose DB connected successfully');
-    const port = process.env.DB_TOKEN;
-    console.log(`Your port is ${port}`);
 });
 
-drinkRoutes.route('/api/register').post(function(req, res) {
+// app.use('/', function(req, res) {
+//     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+//     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE'); // If needed
+//     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type'); // If needed
+//     res.setHeader('Access-Control-Allow-Credentials', true); // If needed
+
+//     //res.send('cors problem fixed:)');
+// });
+
+//AUTHENTICATION
+app.post('/api/register', function(req, res) {
     const { email, password } = req.body;
     const user = new User({ email, password });
     user.save(function(err) { 
@@ -46,7 +55,7 @@ drinkRoutes.route('/api/register').post(function(req, res) {
     })
 })
 
-drinkRoutes.route('/api/authenticate').post(function(req, res) {
+app.post('/api/authenticate', function(req, res) {
     const { email, password } = req.body;
     console.log(email + ' ' + password );
     console.log(secret);
@@ -90,19 +99,43 @@ drinkRoutes.route('/api/authenticate').post(function(req, res) {
     });
   });
 
-drinkRoutes.route('/checkToken').get(withAuth, function(req, res) {
+app.get('/checkToken',withAuth, function(req, res) {
     res.sendStatus(200);
     console.log('succesful token');
 })
 
-drinkRoutes.route('/:name').get(function (req, res) {
+
+//MAIN API CALLS
+app.get('/:name', function (req, res) {
     Drink.findOne({ drink_name : req.params.name }, function(err, drink) {
         res.json(drink);
         //console.log(req.params.name);
     })
 })
 
-drinkRoutes.route('/').get(function(req, res) {
+app.get('/filter/curated',function(req, res) {
+    Drink.find({ curated: true }, function(err, drinks) {
+        if(err){
+            console.log(err);
+        }
+        else{
+            res.json(drinks);
+        }
+    });
+});
+
+app.get('/filter/noncurated',function(req, res) {
+    Drink.find({ curated : false }, function(err, drinks) {
+        if(err){
+            console.log(err);
+        }
+        else{
+            res.json(drinks);
+        }
+    });
+});
+
+app.get('/',function(req, res) {
     Drink.find(function(err, drinks) {
         if(err){
             console.log(err);
@@ -113,13 +146,13 @@ drinkRoutes.route('/').get(function(req, res) {
     });
 });
 
-drinkRoutes.route('/byid/:id').get(withAuth, function(req, res) {
+app.get('/byid/:id', function(req, res) {
     Drink.findById(req.params.id, function(err, drink) {
         res.json(drink);
     });
 });
 
-drinkRoutes.route('/add').post(function(req, res) {
+app.post('/add',function(req, res) {
     let drink = new Drink(req.body);
     drink.save()
         .then(drink => {
@@ -130,16 +163,17 @@ drinkRoutes.route('/add').post(function(req, res) {
         });
 });
 
-drinkRoutes.route('/update/:id').post(function(req, res){
+app.post('/update/:id',function(req, res){
     Drink.findById(req.params.id, function(err, drink) {
         if(!drink){
             res.status(404).send('drink not found');
         }
         else {
-            drink.drink_name = req.body.todo_description;
+            drink.drink_name = req.body.drink_name;
             drink.drink_base_ingredient = req.body.drink_base_ingredient;
-            drink.drink_ingredient = req.body.drink_ingredient;
-            drink.drink_alternate_name = req.body.drink_alternate_name;
+            drink.drink_ingredients = req.body.drink_ingredients;
+            drink.liquors = req.body.liquors;
+            drink.curated = req.body.curated;
 
             drink.save()
                 .then(drink => {
@@ -152,7 +186,7 @@ drinkRoutes.route('/update/:id').post(function(req, res){
     });
 });
 
-drinkRoutes.route('/delete/:id').delete(function(req,res){
+app.delete('/delete/:id',function(req,res){
     Drink.findByIdAndRemove(req.params.id, function(err, drink){ 
         if(!drink){
             res.status(404).send('drink not found');
@@ -165,6 +199,23 @@ drinkRoutes.route('/delete/:id').delete(function(req,res){
         }
     });
 });
+
+//SPECIFIC QUERIES
+
+app.get('/drinks/:search', function(req, res) {
+    var ingredient = req.params.search;
+    Drink.find({drink_liquors: ingredient } , function(err, drink) {
+        res.json(drink);
+    }).sort({'drink_name' : 1})
+});
+
+app.get('/search/:search', function(req, res) {
+    var term = req.params.search;
+    console.log(term);
+    Drink.find({ drink_name : { "$regex": term, "$options": "i" }}, function(err,drinks) {
+        res.json(drinks);
+    });
+})
 
 app.listen(PORT, function() {
     console.log("Server is running on: " + PORT);
