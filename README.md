@@ -1,4 +1,4 @@
-# drinkapp
+# Drink DB
 
 Fullstack web application which acts as an encyclopedia to the recipes and ingredients of various cocktails.
 
