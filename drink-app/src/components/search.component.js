@@ -1,5 +1,9 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import { BrowserRouter as Router,Redirect, Route, Link, NavLink, withRouter } from "react-router-dom";
+import Ingredients from './ingredients.component.js'
+import styled from 'styled-components'
+import Container from 'react-bootstrap/Container'
 
 export default class Search extends Component {
 
@@ -13,6 +17,7 @@ export default class Search extends Component {
             drink_liquors: [],
             drink_ingredients: [],
             drink_alternate_name: '',
+            drink_id: null
         }
     }
 
@@ -30,6 +35,7 @@ export default class Search extends Component {
                 drink_liquors: res.data.drink_liquors,
                 drink_ingredients: res.data.drink_ingredients,
                 drink_alternate_name: res.data.drink_alternate_name,
+                drink_id: res.data._id
                 })
             })
             .catch(err => {
@@ -48,6 +54,7 @@ export default class Search extends Component {
                 drink_liquors: res.data.drink_liquors,
                 drink_ingredients: res.data.drink_ingredients,
                 drink_alternate_name: res.data.drink_alternate_name,
+                drink_id: res.data._id
                 })
             })
             .catch(err => {
@@ -58,14 +65,19 @@ export default class Search extends Component {
         }
     }
 
-    render(){
-        return (
-            <div className="container">
-                <h1> Results </h1>
-                <h2>drink name:  {this.props.match.params.id}</h2>
-                <h2>drink state:  {this.state.drink_name}</h2>
-                <h2>drink_liquors: {this.state.drink_liquors} </h2>
-            </div>
-        )
+    render() {
+        const { drink_id } = this.state;
+        if (drink_id === null) {
+            return (
+                <Container>
+                    <h1>Invalid Search</h1>
+                </Container>
+            )
+        } else {
+            return (
+                <Redirect to={"/cocktail/" + drink_id} location={this.props.location} key={this.props.location.key}
+                    render={props => <Ingredients {...props} key={this.props.location.key} />} />
+            )
+        }
     }
 }

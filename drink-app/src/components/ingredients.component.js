@@ -25,23 +25,30 @@ export default class Ingredients extends Component {
 
         this.state = {
             drinks: [],
-            drink_name: '',
+            drink_name: null,
             drink_special_instructions: '',
             drink_liquors: [],
             drink_ingredients: [],
             drink_alternate_name: '',
             drink_glass: ''
         }
+
     }
 
     drinkList() {
         return this.state.drinks.map(function (currentDrink, i) {
-            return <Drink drink={currentDrink} key={i} />
+            if( i < 6 ){
+                return <Drink drink={currentDrink} key={i} />
+            }
+            else{
+                return
+            }
         });
     }
 
     async componentDidMount() {
         this.mounted = true;
+        
 
         const [firstRes, secondRes] = await Promise.all([
             axios.get('http://localhost:4000/byid/' + this.props.match.params.id),
@@ -87,7 +94,7 @@ export default class Ingredients extends Component {
             <Container>
                 <h1>{this.state.drink_name}</h1>
                 <Row>
-                    <Col sm={8}>
+                    <Col lg={8}>
                         <Row>
                             <Col sm={6} xs={6}>
                                 <h3>Ingredients</h3>
@@ -105,11 +112,11 @@ export default class Ingredients extends Component {
                             </Col>
                         </Row>
                     </Col>
-                    <Col sm={4}>
+                    <Col lg={{offset:0, span: 4}} md={{offset:2, span: 8}}>
                         <Table borderless>
                             <thead>
                                 <TableRowHeadStyled>
-                                    <th>Similar Drinks</th>
+                                    <th>More Drinks</th>
                                 </TableRowHeadStyled>
                             </thead>
                             <TableBodyStyled>

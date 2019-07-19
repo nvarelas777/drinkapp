@@ -7,13 +7,18 @@ import Form from 'react-bootstrap/Form';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row'
 import styled from 'styled-components';
+import Pagination from 'react-bootstrap/Pagination'
 
 const Drink = props => (
     <TableRowStyled >
         <td><Link to={"/cocktail/" + props.drink._id}>{props.drink.drink_name}</Link></td>
-        <td>{props.drink.drink_liquors}</td>
+        <td>{printLiquors(props)}</td>
     </TableRowStyled>
 )
+
+let printLiquors = props => {
+    return props.drink.drink_liquors.join(' / ');
+}
 
 export default class Drinks extends Component {
 
@@ -26,25 +31,9 @@ export default class Drinks extends Component {
             drinks: [],
             null_search: [],
             search: '',
+            currentPage: 1,
+            numItems: 5,
         };
-    }
-
-    handleClick() {
-        console.log('works')
-    }
-
-    drinkList() {
-        if (this.state.drinks === null || this.state.drinks.length === 0) {
-            return (
-                <TableRowStyled>
-                <td>No Results :(</td>
-                <td></td>
-            </TableRowStyled>
-            )
-        }
-        return this.state.drinks.map(function (currentDrink, i) {
-            return <Drink drink={currentDrink} key={i} />
-        });
     }
 
     componentDidMount() {
@@ -77,14 +66,15 @@ export default class Drinks extends Component {
     }
 
     onSearch = e => {
-        if (e.target.value === '') {
+        let val = e.target.value.replace(/\s+/g,'');
+        if (val=== '') {
             this.setState({
                 drinks: this.state.null_search
             })
         }
         else {
             this.setState({
-                search: e.target.value
+                search: val
             }, this.doSearch);
         }
     }
@@ -92,7 +82,10 @@ export default class Drinks extends Component {
     doSearch() {
         axios.get('http://localhost:4000/search/' + this.state.search)
             .then(res => {
-                this.setState({ drinks: res.data })
+                this.setState({ 
+                    drinks: res.data,
+                    currentPage: 1
+                 })
             })
             .catch(function (err) {
                 console.log(err);
@@ -103,31 +96,64 @@ export default class Drinks extends Component {
         this.mounted = false;
     }
 
+    handlePageChange = page => {
+        this.setState({
+            currentPage: page
+        })
+    }
+
     render() {
+
+        const { drinks, numItems, currentPage } = this.state;
+        const indexBegin = currentPage * numItems - numItems;
+        const indexEnd = indexBegin + numItems;
+        const drinksList = drinks.slice(indexBegin, indexEnd);
+
+        const renderDrinks = drinksList.map((currentDrink,i) => {
+            return (
+                <Drink drink={currentDrink} key={i}></Drink>
+            )
+        })
+
+        const lastPage = Math.floor(drinks.length / numItems);
+
+        const createPagination = () => {
+            let paginationArray = [];
+            for (let i = 1; i <=lastPage;i++){
+                paginationArray.push(<Pagination.Item key={i} onClick={() => this.handlePageChange(i)}>{i}</Pagination.Item>)
+            }
+            return paginationArray;
+        }
+
         return (
             <ContainerStyled>
                 <Row>
-                    <Col sm={{ span: 6, offset: 3 }}>
+                    <Col lg={{ span: 6, offset: 3 }}>
                         <Form>
                             <FormGroupStyled>
                                 <Row>
                                     <Col md={6}>
-                                        <Form.Control placeholder="Search" onChange={this.onSearch}></Form.Control>
+                                        <Form.Control placeholder="Search by Name" onChange={this.onSearch}></Form.Control>
                                     </Col>
                                 </Row>
                             </FormGroupStyled>
                         </Form>
-                        <TableStyled borderless>
-                            <TableHeadStyled>
-                                <TableRowHeadStyled>
-                                    <th>Name</th>
-                                    <th>Liquor</th>
-                                </TableRowHeadStyled>
-                            </TableHeadStyled>
-                            <tbody>
-                                {this.drinkList()}
-                            </tbody>
-                        </TableStyled>
+                        <ContainerTableStyled>
+                            <Table borderless>
+                                <thead>
+                                    <TableRowHeadStyled>
+                                        <th>Name</th>
+                                        <th>Liquor</th>
+                                    </TableRowHeadStyled>
+                                </thead>
+                                <tbody>
+                                    {renderDrinks}
+                                </tbody>
+                            </Table>
+                        </ContainerTableStyled>           
+                        <Pagination>
+                            {createPagination()}
+                        </Pagination>
                     </Col>
                 </Row>
             </ContainerStyled>
@@ -143,18 +169,17 @@ const ContainerStyled = styled(Container)`
 padding-bottom: .75em;
 `;
 
-const TableHeadStyled = styled.thead`
-    background-color: white;
+const ContainerTableStyled = styled(Container)`
+border-radius: 8px;
+background-color: #abeaff;
+margin-top: 10px;
 `
+
 const TableRowHeadStyled =  styled.tr`
-    border-bottom: 2px solid black;
+    font-size: 20px;
 `;
 
 const TableRowStyled = styled.tr`
-    border: 2px solid black;
-`;
-
-
-const TableStyled = styled(Table)`
-    background-color: #abeaff;
+    font-size: 18px;
+    font-weight: bold;
 `;

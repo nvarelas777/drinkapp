@@ -8,6 +8,7 @@ import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import Button from 'react-bootstrap/Button'
 import styled from 'styled-components'
+import Alert from 'react-bootstrap/Alert';
 
 export default class DrinkAdminAdd extends Component {
     constructor(props) {
@@ -19,8 +20,13 @@ export default class DrinkAdminAdd extends Component {
             wasAdded: '',
             drink_glass: '',
             drink_liquors: '',
-            dropDownValue: 'Select...'
+            dropDownValue: 'Select...',
+            ingredient_alert: false,
+            alert_successful:false,
+            alert_unsuccessful: false,
         }
+
+        this.initialState = this.state;
     }
 
     handleNameChange = e => {
@@ -48,7 +54,7 @@ export default class DrinkAdminAdd extends Component {
             return (
                 <Row key={i}>
                     <Col sm={6}>
-                        <Form.Control value={currentIngredient} onChange={(e) => this.handleIngredientChange(i, e)} />
+                        <Form.Control value={this.state.drink_ingredients[i]} onChange={(e) => this.handleIngredientChange(i, e)} />
                     </Col>
                 </Row>
             )
@@ -62,9 +68,16 @@ export default class DrinkAdminAdd extends Component {
     }
 
     addIngredient() {
-        this.setState({
-            drink_ingredients: [...this.state.drink_ingredients, '']
-        })
+        if (this.state.drink_ingredients.length < 10) {
+            this.setState({
+                drink_ingredients: [...this.state.drink_ingredients, '']
+            })
+        }
+        else{
+            this.setState({
+                ingredient_alert: true
+            })
+        }
         this.renderIngredients();
     }
 
@@ -74,35 +87,35 @@ export default class DrinkAdminAdd extends Component {
         })
     }
 
-     onSubmit = async e => {
+    onSubmit = async e => {
         e.preventDefault();
 
-        for(var i =0; i <= this.state.drink_ingredients.length;i++){
-            if(this.state.drink_ingredients[i] === '' || this.state.drink_ingredients[i] === null){
+        for (var i = 0; i <= this.state.drink_ingredients.length; i++) {
+            if (this.state.drink_ingredients[i] === '' || this.state.drink_ingredients[i] === null) {
                 var stateCopy = [...this.state.drink_ingredients];
                 stateCopy.splice(i, this.state.drink_ingredients.length - i);
                 await this.setState({
                     drink_ingredients: stateCopy
                 })
-            }        
+            }
         }
 
-        const liquorSet = new Set(["Vodka", "Rum","Tequila"]);
-        
+        const liquorSet = new Set(["Vodka", "Rum", "Tequila", "Gin",  ]);
+
         const liquors = [];
-        for(let i = 0; i < this.state.drink_ingredients.length;i++){
+        for (let i = 0; i < this.state.drink_ingredients.length; i++) {
             let strLength = this.state.drink_ingredients[i].length;
-            while(this.state.drink_ingredients[i].charAt(strLength) !== ' ' && strLength > 0){
+            while (this.state.drink_ingredients[i].charAt(strLength) !== ' ' && strLength > 0) {
                 strLength--;
             }
-            const ingredient = this.state.drink_ingredients[i].substring(strLength+1, this.state.drink_ingredients[i].length);
+            const ingredient = this.state.drink_ingredients[i].substring(strLength + 1, this.state.drink_ingredients[i].length);
             console.log(ingredient);
 
-            if (liquorSet.has(ingredient)){
+            if (liquorSet.has(ingredient)) {
                 liquors.push(ingredient);
             }
 
-        } 
+        }
         console.log(liquors);
         await this.setState({
             drink_liquors: liquors
@@ -119,32 +132,40 @@ export default class DrinkAdminAdd extends Component {
 
         Axios.post('http://localhost:4000/add', obj)
             .then(res => {
-                console.log(res.data)
+
                 this.setState({
-                    wasAdded: 'Added!'
+                    wasAdded: '',
+                    alert_successful: true,
+                    drink_name: '',
+                    drink_special_instructions: '',
+                    drink_ingredients: [],
+                    drink_glass: '',
+                    dropDownValue: 'Select...',
                 });
                 setTimeout(() => {
                     this.setState({
-                        wasAdded: ''
+                        alert_successful: false
                     });
-                }, 2000);
+                }, 3000);
+           
             })
             .catch(err => {
                 console.log(err);
                 this.setState({
-                    wasAdded: 'Not Added!'
-
+                    wasAdded: 'Not Added!',
+                    alert_unsuccessful: true,
                 });
                 setTimeout(() => {
                     this.setState({
-                        wasAdded: ''
+                        wasAdded: '',
+                        alert_unsuccessful: false
                     });
-                }, 2000);
+                }, 3000);
             })
 
     }
 
-    changeValue(text){
+    changeValue(text) {
         this.setState({
             dropDownValue: text
         })
@@ -153,45 +174,61 @@ export default class DrinkAdminAdd extends Component {
     render() {
         return (
             <ContainerStyled>
-                <Col sm={this.props.setParams === undefined ? {offset: 3, span :6} : this.props.setParams}>
-                <FormStyled>
-                    <FormGroupStyled>
-                        <Form.Label>Drink Name</Form.Label>
-                        <Col>
-                            <Form.Control onChange={this.handleNameChange}></Form.Control>
-                        </Col>
-                    </FormGroupStyled>
-                    <FormGroupStyled>
-                        <Form.Label>Special Instructions</Form.Label>
-                        <Col>
-                            <Form.Control as="textarea" rows="3" onChange={this.handleSpecialInstructionChange}></Form.Control>
-                        </Col>
-                    </FormGroupStyled>
-                    <FormGroupStyled>
-                        <Form.Label>Ingredients</Form.Label>
-                        <Button onClick={() => this.addIngredient()}>+</Button>
-                        {this.renderIngredients()}
-                    </FormGroupStyled>
-                    <FormGroupStyled>
-                        <Form.Label>Liquors</Form.Label>
-                        <Col>
-                        <Form.Control onChange={this.handleLiquorChange}></Form.Control>
-                        </Col>
-                    </FormGroupStyled>
-                    <FormGroupStyled>
-                        <Form.Label>Glass Type</Form.Label>
-                        <DropdownButton title={this.state.drink_glass} onSelect={this.glassType} title={this.state.dropDownValue}>
-                            <Dropdown.Item eventKey="1"><div onClick={(e) => this.changeValue(e.target.textContent)}>Shot</div></Dropdown.Item>
-                            <Dropdown.Item eventKey="2"><div onClick={(e) => this.changeValue(e.target.textContent)}>Rocks/Shooter</div></Dropdown.Item>
-                            <Dropdown.Item eventKey="3"><div onClick={(e) => this.changeValue(e.target.textContent)}>Bomb</div></Dropdown.Item>
-                        </DropdownButton>
-                    </FormGroupStyled>
-                    <Form.Group>
-                        <DivSubmitStyled>
-                            <Button onClick={this.onSubmit}>Submit</Button>
-                        </DivSubmitStyled>
-                    </Form.Group>
-                </FormStyled>
+                <Col lg={this.props.setParams === undefined ? { offset: 3, span: 6 } : this.props.setParams}>
+                    <Alert variant="warning">New cocktails will need admin approval before being visible.</Alert>
+                <Row>
+                    <Col sm={12}>
+                        <Alert variant="success" show={this.state.alert_successful}>
+                        Drink Successfully Added!
+                        </Alert>
+                        <Alert variant="danger" show={this.state.alert_unsuccessful}>
+                            Drink Not Added!
+                        </Alert>
+                    </Col>
+                </Row>
+                    <FormStyled>
+                        <FormGroupStyled>
+                            <Form.Label>Drink Name</Form.Label>
+                            <Col>
+                                <Form.Control value={this.state.drink_name} onChange={this.handleNameChange}></Form.Control>
+                            </Col>
+                        </FormGroupStyled>
+                        <FormGroupStyled>
+                            <Form.Label>Special Instructions</Form.Label>
+                            <Col>
+                                <Form.Control as="textarea" rows="3" value={this.state.drink_special_instructions} onChange={this.handleSpecialInstructionChange}></Form.Control>
+                            </Col>
+                        </FormGroupStyled>
+                        <FormGroupStyled>
+                            <Row>
+                                <Col sm={3}>
+                                    <Form.Label>Ingredients</Form.Label>
+                                </Col>
+                                <Col sm={{span:6, offset: 3}}>
+                                <Alert variant="danger" show={this.state.ingredient_alert}>
+                                    Maximum 10 Ingredients!
+                                 </Alert>
+                                </Col>
+                            </Row>
+                            <Col>
+                                <Button onClick={() => this.addIngredient()}>Add Ingredient</Button>
+                            </Col>
+                            {this.renderIngredients()}
+                        </FormGroupStyled>
+                        <FormGroupStyled>
+                            <Form.Label>Glass Type</Form.Label>
+                            <DropdownButton onSelect={this.glassType} title={this.state.dropDownValue}>
+                                <Dropdown.Item eventKey="Shot"><div onClick={(e) => this.changeValue(e.target.textContent)}>Shot</div></Dropdown.Item>
+                                <Dropdown.Item eventKey="Rocks/Shooter"><div onClick={(e) => this.changeValue(e.target.textContent)}>Rocks/Shooter</div></Dropdown.Item>
+                                <Dropdown.Item eventKey="Bomb"><div onClick={(e) => this.changeValue(e.target.textContent)}>Bomb</div></Dropdown.Item>
+                            </DropdownButton>
+                        </FormGroupStyled>
+                        <Form.Group>
+                            <DivSubmitStyled>
+                                <Button onClick={this.onSubmit}>Submit</Button>
+                            </DivSubmitStyled>
+                        </Form.Group>
+                    </FormStyled>
                 </Col>
             </ContainerStyled>
         )

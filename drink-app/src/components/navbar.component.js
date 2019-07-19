@@ -63,7 +63,7 @@ export default class Navigationbar extends Component {
         </ImgWrapper>
         <NavStyle expand="lg">
           <Row>
-            <Col sm={12} xs={3}>
+            <Col sm={12} xs={4}>
               <Navbar.Toggle aria-controls="basic-navbar-nav" />
               <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="mr-auto">
@@ -72,10 +72,8 @@ export default class Navigationbar extends Component {
                   <NavLinkStyle as={NavLink} to="/shots">Shots</NavLinkStyle>
                   <NavLinkStyle as={NavLink} to="/about">About</NavLinkStyle>
                   <NavLinkStyle as={NavLink} to="/submitrecipe">New Cocktail</NavLinkStyle>
-                  <li className="navbar-item">
-                    <button onClick={this.props.onGreet}></button>
-                  </li>
-                  {this.props.isLogin === 'workssss' ? <li className="navbar-item"><Link to={{ pathname: '/admincontrol', authorized: this.props.isLogin }} className="nav-link">Control</Link></li> : <p>erwe</p>}
+                  <NavLinkStyle as={NavLink} to="/admincontrol">Control</NavLinkStyle>
+                  {this.props.isLogin === 'workssss' ? <li className="navbar-item"><Link to={{ pathname: '/admincontrol', authorized: this.props.isLogin }} className="nav-link">Control</Link></li> : <p></p>}
                 </Nav>
                 <FormNavExpandedStyled inline>
                   <Row>
@@ -85,13 +83,13 @@ export default class Navigationbar extends Component {
                 </FormNavExpandedStyled>
               </Navbar.Collapse>
             </Col>
-            <Col xs={8}>
+            <Col sm={12} xs={8}>
               <FormNavStyled>
                 <Row>
-                  <Col xs={8}>
+                  <Col sm={8} xs={8}>
                     <FormControlStyle type="text" id="searchItem" onChange={this.handleChange} />
                   </Col>
-                  <Col xs={4}>
+                  <Col sm={4} xs={4}>
                     <NavLinkStyleSearch as={NavLink} to={"/search=" + this.state.searchVal}>Search</NavLinkStyleSearch>
                   </Col>
                 </Row>
@@ -128,7 +126,6 @@ max-height:100%;
 `
 
 const ImgWrapper = styled.section`
-
 `
 
 
@@ -165,15 +162,17 @@ const FormControlStyle = styled(FormControl)`
 const NavLinkStyleSearch = styled(NavLink)`
   color: black;
   font-weight: bold;
-  padding-left:.6em;
-  padding-right:.6em;
-  padding-top: .4em;
-  padding-bottom: .4em;
+  padding: .5em;
   outline-width: 0px;
   outline-style: solid;
   background-color: #ffd58c;
   border-radius: 5px;
-  margin-top:5px;
+
+  @media (max-width: 480px) { 
+    display:inline-block;
+    padding: .4em;
+    margin-top:1px;
+   }
 `;
 
 const ContainerStyled = styled(Container)`

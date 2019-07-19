@@ -28,34 +28,6 @@ export default class Home extends Component {
     }
 
     async componentDidMount() {
-        // axios.get('http://localhost:4000/drinks/Vodka')
-        //     .then(res => {
-        //         this.setState({
-        //             vodka_drinks: res.data
-        //         })
-        //     })
-        //     .catch(err => {
-        //         console.log('not found')
-        //     })
-
-        // axios.get('http://localhost:4000/drinks/rum')
-        //     .then(res => {
-        //         this.setState({
-        //             rum_drinks: res.data
-        //         })
-        //     })
-        //     .catch(err => {
-        //         console.log('not found')
-        //     })
-        // axios.get('http://localhost:4000/drinks/tequila')
-        //     .then(res => {
-        //         this.setState({
-        //             tequila_drinks: res.data
-        //         })
-        //     })
-        //     .catch(err => {
-        //         console.log('not found')
-        //     })
 
         const [firstRes, secondRes, thirdRes] = await Promise.all([
             axios.get('http://localhost:4000/drinks/Vodka'),
@@ -72,23 +44,25 @@ export default class Home extends Component {
 
     vodkaList() {
         return this.state.vodka_drinks.map((currentDrink, i) => {
-            if (i < 2) {
+            if (i < 5 ) {
                 return <Drink drink={currentDrink} key={i} />
             }
-            else
-                return;
         });
     }
 
     rumList() {
         return this.state.rum_drinks.map((currentDrink, i) => {
-            return <Drink drink={currentDrink} key={i} />
+            if( i < 5 ){
+                return <Drink drink={currentDrink} key={i} />
+            }
         });
     }
 
     tequilaList() {
         return this.state.tequila_drinks.map((currentDrink, i) => {
-            return <Drink drink={currentDrink} key={i} />
+            if(i < 5 ){
+                return <Drink drink={currentDrink} key={i} />
+            }
         });
     }
 
@@ -96,9 +70,9 @@ export default class Home extends Component {
         return (
             <ContainerComponent>
                 <Row>
-                    <Col sm={4}>
-                        <Row>
-                            <ContainerTableStyle borderless>
+                    <Col lg={{offset:0, span: 4}} md={{offset: 1, span: 10}}>
+                        
+                            <ContainerTableStyle>
                                 <Table borderless>
                                     <thead>
                                         <tr>
@@ -109,31 +83,34 @@ export default class Home extends Component {
                                         {this.vodkaList()}
                                     </TableBody>
                                 </Table>
-                            </ContainerTableStyle>
-                        </Row>
+                            </ContainerTableStyle>                      
                     </Col>
-                    <Col sm={4}>
-                        <ContainerTableStyle borderless>
-                            <thead>
-                                <tr>
-                                    <ThBodyHeaderStyle>Rum Drinks </ThBodyHeaderStyle>
-                                </tr>
-                            </thead>
-                            <TableBody>
-                                {this.rumList()}
-                            </TableBody>
+                    <Col lg={{offset:0, span: 4}} md={{offset: 1, span: 10}}>
+                        <ContainerTableStyle>
+                            <Table borderless>
+                                <thead>
+                                    <tr>
+                                        <ThBodyHeaderStyle>Rum Drinks </ThBodyHeaderStyle>
+                                    </tr>
+                                </thead>
+                                <TableBody>
+                                    {this.rumList()}
+                                </TableBody>
+                            </Table>
                         </ContainerTableStyle>
                     </Col>
-                    <Col sm={4}>
-                        <ContainerTableStyle borderless>
-                            <thead>
-                                <tr>
-                                    <ThBodyHeaderStyle>Tequila Drinks</ThBodyHeaderStyle>
-                                </tr>
-                            </thead>
-                            <TableBody>
-                                {this.tequilaList()}
-                            </TableBody>
+                    <Col lg={{offset:0, span: 4}} md={{offset: 1, span: 10}}>
+                        <ContainerTableStyle>
+                            <Table borderless>
+                                <thead>
+                                    <tr>
+                                        <ThBodyHeaderStyle>Tequila Drinks</ThBodyHeaderStyle>
+                                    </tr>
+                                </thead>
+                                <TableBody>
+                                    {this.tequilaList()}
+                                </TableBody>
+                            </Table>
                         </ContainerTableStyle>
 
                     </Col>

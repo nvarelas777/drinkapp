@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { BroserRouter, Link } from 'react-router-dom'
-
+import { Link } from 'react-router-dom'
+import Container from 'react-bootstrap/Container';
+import Table from '../shared/Table.js'
 
 export default class PendingApproval extends Component {
     constructor(props) {
@@ -46,7 +47,7 @@ export default class PendingApproval extends Component {
     listIngredients(currentDrink) {
         return currentDrink.drink_ingredients.map((ingredient, i) => {
             return (
-                <li>
+                <li key={i}>
                     {currentDrink.drink_ingredients[i]}
                 </li>
             )
@@ -56,19 +57,14 @@ export default class PendingApproval extends Component {
     drinkList() {
         return this.state.drinks.map((currentDrink, i) => {
             return (
-                <tbody key={i}>
-                    
-                        <tr>
-                        
-                            <div className="row">
-                            <td className="col-sm-3">{currentDrink.drink_name}</td>
-                            <td className="col-sm-3">{currentDrink.drink_glass}</td>
-                            <td className="col-sm-3">{this.listIngredients(currentDrink)}</td>
-                            <button className="col-sm-1" onClick={() => this.handleClick(currentDrink)}>Approve</button>
-                            <Link to={"/edit/"+currentDrink._id}>edit</Link>
-                            </div>
-                        </tr>
-                    
+                <tbody key={i}>                 
+                    <tr>
+                        <td>{currentDrink.drink_name}</td>
+                        <td>{currentDrink.drink_glass}</td>
+                        <td className="d-none d-md-block">{this.listIngredients(currentDrink)}</td>
+                        <td><button  onClick={() => this.handleClick(currentDrink)}>Approve</button></td>
+                        <td><Link to={"/edit/" + currentDrink._id}>edit</Link></td>
+                    </tr>                   
                 </tbody>
             )
         });
@@ -76,24 +72,21 @@ export default class PendingApproval extends Component {
 
     render() {
         return (
-            <div className="container">
-                <table className="table">
+            <Container>
+                <Table borderless>
                     <thead>
-
                         <tr>
-                            <div className="row">
-                                <th className="col-sm-3">Name</th>
-                                <th className="col-sm-3">Glass Type</th>
-                                <th className="col-sm-3">Ingredients</th>
-                            </div>
+                            <th>Name</th>
+                            <th>Glass Type</th>
+                            <th className="d-none d-md-block">Ingredients</th>
+                            <th>Approve</th>
+                            <th>Edit</th>
                         </tr>
-
                     </thead>
-
-                    {this.drinkList()}
-
-                </table>
-            </div>
+                        {this.drinkList()}
+                </Table>
+            </Container>
         )
     }
 }
+

@@ -1,14 +1,11 @@
 import React, { Component } from 'react';
-import { BrowserRouter, Route, NavLink } from 'react-router-dom';
+import { Route, NavLink } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 import styled from 'styled-components';
 import Login from './login.component.js';
 import Navbar from 'react-bootstrap/Navbar';
 
 export default class Footer extends Component {
-    constructor(props){
-        super(props);
-    }
 
     render() {
         return (

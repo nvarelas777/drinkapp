@@ -1,5 +1,12 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import styled from 'styled-components'
+import Container from 'react-bootstrap/Container'
+import Button from 'react-bootstrap/Button'
+import Row from 'react-bootstrap/Row'
+import Col from 'react-bootstrap/Col'
+import Alert from 'react-bootstrap/Alert'
+
 
 export default class DrinkAdminEdit extends Component {
 
@@ -17,7 +24,9 @@ export default class DrinkAdminEdit extends Component {
             drink_liquors: [],
             drink_special_instructions: '',
             drink_glass: '',
-            curated: null
+            curated: null,
+            alert_success: false,
+            alert_unsuccessful: false,
         }
     }
 
@@ -128,7 +137,12 @@ export default class DrinkAdminEdit extends Component {
     removeDrink = e => {
         axios.delete('http://localhost:4000/delete/' + this.props.match.params.id)
             .then(res => {
-                console.log('successfully deleted!')
+                this.setState({
+                    alert_success: true
+                })
+                setTimeout(() => {
+                    this.props.history.goBack();
+                }, 1000)
             })
             .catch(err => {
                 console.log(err);
@@ -138,7 +152,7 @@ export default class DrinkAdminEdit extends Component {
     submitChange = async e => {
         e.preventDefault();
 
-        const liquorSet = new Set(["vodka", "rum","tequila"]);
+        const liquorSet = new Set(["Vodka", "Rum","Tequila"]);
         
         const liquors = [];
         for(let i = 0; i < this.state.drink_ingredients.length;i++){
@@ -158,6 +172,7 @@ export default class DrinkAdminEdit extends Component {
         await this.setState({
             drink_liquors: liquors
         });
+        console.log(this.state.drink_liquors.length);
 
         const obj = {
             drink_name: this.state.drink_name,
@@ -167,43 +182,100 @@ export default class DrinkAdminEdit extends Component {
             curated: this.state.curated
         }
 
+        console.log(obj.drink_liquors)
+
         axios.post('http://localhost:4000/update/' + this.props.match.params.id, obj)
             .then(res => {
-                console.log(res.data)
+                this.setState({
+                    alert_success: true,
+                })
+                setTimeout(() => {
+                    this.props.history.goBack();                 
+                }, 1000)
             })
             .catch(err => {
-                console.log(err);
+                this.setState({
+                    alert_unsuccessful: true
+                })
+                setTimeout(() => {
+                    this.setState({
+                        alert_unsuccessful: false
+                    })
+                }, 1000)
             })
-        this.props.history.goBack();
+        
     }
 
     render() {
         return (
-            <div>
-                <h1>Admin Edit!{this.state.drink_name}</h1>
-
-                <div className="row">
-                    <label className="col-lg-2 col-sm-4">drink name</label>
-                    <input className="col-lg-3 col-sm-4" type="text" value={this.state.drink_name} onChange={this.onNameChange} />
-                </div>
-                <div className="row">
-                    <label className="col-lg-2 col-sm-4">drink special instructions</label>
-                    <input className="col-lg-3 col-sm-4" type="text" value={this.state.drink_special_instructions} onChange={this.onBaseIngredientChange}></input>
-                </div>
-                <div className="row">
-                    <label className="col-lg-2 col-sm-4">drink ingredients</label>
-                    <button onClick={(e) => this.addIngredient(e)}>+</button>
-                    {this.renderIngredients()}
-                </div>
-                {/* <div className="row">
-                    <label className="col-lg-2 col-sm-4">Alternate Names</label>
-                    <button onClick={(e) => this.addAlternateName(e)}>+</button>
-                    {this.renderAlternateNames()}
-                </div> */}
-                <button onClick={this.submitChange}>Update</button>
-                <button onClick={this.removeDrink}>Remove Drink</button>
-            </div>
-
+            <Container>
+                <Row>
+                    <Col lg={{ offset: 3, span: 6 }}>
+                        <Alert variant="success" show={this.state.alert_success}>
+                            Drink Updated!
+                        </Alert>
+                        <Alert variant="danger" show={this.state.alert_unsuccessful}>
+                            Updaate Failed!
+                        </Alert>
+                        <ContainerStyled>                           
+                            <HeaderStyled>
+                                {this.state.drink_name}
+                            </HeaderStyled>                          
+                            <RowStyled>
+                                <Col>
+                                    <label>Name</label>
+                                    </Col>
+                                    <Col>
+                                    <input type="text" value={this.state.drink_name} onChange={this.onNameChange} />                               
+                                    </Col>
+                            </RowStyled>
+                            <RowStyled>
+                                <Col>
+                                    <label>Special Instructions</label>
+                                    </Col>
+                                    <Col>
+                                    <input type="text" value={this.state.drink_special_instructions} onChange={this.onBaseIngredientChange}></input>
+                                    </Col>
+                            </RowStyled>
+                            <RowStyled>
+                                <Col>
+                                    <label>Drink Ingredients</label>
+                                    <button onClick={(e) => this.addIngredient(e)}>+</button>
+                                </Col>
+                                <Col>
+                                    {this.renderIngredients()}
+                                </Col>
+                            </RowStyled>
+                            <RowStyled>
+                                <Col sm={{span: 6, offset:3}}>    
+                                    <ButtonStyled onClick={this.submitChange}>Update</ButtonStyled>
+                                    <ButtonStyled onClick={this.removeDrink}>Remove Drink</ButtonStyled>
+                                </Col>
+                            </RowStyled>
+                        </ContainerStyled>
+                    </Col>
+                </Row>
+            </Container>
         )
     }
 }
+
+const ContainerStyled = styled(Container)`
+background-color: #abeaff;
+padding: 20px;
+border-radius: 8px;
+`
+
+const RowStyled = styled(Row)`
+padding-top: 1em;
+padding-bottom: 1em;
+border-top: 1px solid grey;
+`
+
+const ButtonStyled = styled(Button)`
+margin: 3px;
+`
+
+const HeaderStyled = styled.h1`
+  text-align: center;
+`

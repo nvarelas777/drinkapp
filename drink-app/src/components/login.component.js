@@ -44,8 +44,7 @@ export default class Login extends Component {
         })
             .then(res => {
                 if (res.status === 200) {
-                    this.props.location.onGreet();
-                    this.props.history.push('/');
+                    this.props.history.push('/admincontrol');
                 } else {
                     const error = new Error(res.error);
                     throw error;
@@ -70,7 +69,7 @@ export default class Login extends Component {
                     </Form.Group>
                     <Form.Group>
                         <Form.Label>Password</Form.Label>
-                        <Form.Control onChange={this.handlePasswordChange}></Form.Control>
+                        <Form.Control type="password" onChange={this.handlePasswordChange}></Form.Control>
                     </Form.Group>
                     <Form.Control type="submit" value="Submit" />
                 </FormStyled>

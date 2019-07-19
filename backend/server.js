@@ -41,7 +41,8 @@ connection.once('open', function() {
 // });
 
 //AUTHENTICATION
-app.post('/api/register', function(req, res) {
+//Adding New
+/* app.post('/api/register', function(req, res) {
     const { email, password } = req.body;
     const user = new User({ email, password });
     user.save(function(err) { 
@@ -53,7 +54,7 @@ app.post('/api/register', function(req, res) {
             res.status(200).send("Welcome")
         }
     })
-})
+}) */
 
 app.post('/api/authenticate', function(req, res) {
     const { email, password } = req.body;
@@ -172,7 +173,7 @@ app.post('/update/:id',function(req, res){
             drink.drink_name = req.body.drink_name;
             drink.drink_base_ingredient = req.body.drink_base_ingredient;
             drink.drink_ingredients = req.body.drink_ingredients;
-            drink.liquors = req.body.liquors;
+            drink.drink_liquors = req.body.drink_liquors;
             drink.curated = req.body.curated;
 
             drink.save()
@@ -204,14 +205,13 @@ app.delete('/delete/:id',function(req,res){
 
 app.get('/drinks/:search', function(req, res) {
     var ingredient = req.params.search;
-    Drink.find({drink_liquors: ingredient } , function(err, drink) {
+    Drink.find({curated: true,drink_liquors: ingredient } , function(err, drink) {
         res.json(drink);
     }).sort({'drink_name' : 1})
 });
 
 app.get('/search/:search', function(req, res) {
     var term = req.params.search;
-    console.log(term);
     Drink.find({ drink_name : { "$regex": term, "$options": "i" }}, function(err,drinks) {
         res.json(drinks);
     });
