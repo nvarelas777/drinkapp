@@ -4,6 +4,7 @@ import Form from 'react-bootstrap/Form'
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import Container from 'react-bootstrap/Container'
+import Alert from 'react-bootstrap/Alert';
 import styled from 'styled-components'
 
 export default class Login extends Component {
@@ -45,23 +46,24 @@ export default class Login extends Component {
             .then(res => {
                 if (res.status === 200) {
                     this.props.history.push('/admincontrol');
-                } else {
-                    const error = new Error(res.error);
-                    throw error;
-                }
+                } 
             })
             .catch(err => {
-                console.error(err);
                 this.setState({
                     isWrong: true
                 })
+                setTimeout(() => {
+                    this.setState({
+                        isWrong: false
+                    });
+                }, 2000);
             });
     }
 
     render() {
         return (
             <ContainerStyled>
-            <Col sm={{offset: 4, span: 4}}>
+            <Col lg={{offset: 4, span: 4}} md={{offset: 2, span: 8}}>
                 <FormStyled onSubmit={this.onSubmit}>
                     <Form.Group>
                         <Form.Label>Email</Form.Label>
@@ -73,7 +75,9 @@ export default class Login extends Component {
                     </Form.Group>
                     <Form.Control type="submit" value="Submit" />
                 </FormStyled>
-                {this.state.isWrong === true ? <p>wrong password</p> : <p></p>}
+                <AlertStyled variant="danger" show={this.state.isWrong}>
+                    Invalid Login!
+                </AlertStyled>
             </Col>
             </ContainerStyled>
         )
@@ -90,4 +94,9 @@ const FormStyled = styled(Form)`
     padding: 1em;
     border-radius:8px;
     background-color: #abeaff;
+    margin-bottom: 10px;
+    font-weight: bold;
     `
+const AlertStyled = styled(Alert)`
+font-weight: bold;
+`

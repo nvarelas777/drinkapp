@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Route, Link, NavLink, withRouter } from "react
 import styled from 'styled-components';
 import About from './about.component';
 import Drinks from './drinks.component';
-import Shots from './shots.component';
 import Ingredients from './ingredients.component';
 import Search from './search.component';
 import Login from './login.component';
@@ -69,7 +68,6 @@ export default class Navigationbar extends Component {
                 <Nav className="mr-auto">
                   <NavLinkStyle onSelect={() => null} as={NavLink} to="/" exact>Home</NavLinkStyle>
                   <NavLinkStyle as={NavLink} to="/drinks">Drinks</NavLinkStyle>
-                  <NavLinkStyle as={NavLink} to="/shots">Shots</NavLinkStyle>
                   <NavLinkStyle as={NavLink} to="/about">About</NavLinkStyle>
                   <NavLinkStyle as={NavLink} to="/submitrecipe">New Cocktail</NavLinkStyle>
                   <NavLinkStyle as={NavLink} to="/admincontrol">Control</NavLinkStyle>
@@ -101,7 +99,6 @@ export default class Navigationbar extends Component {
         <Route exact path="/" component={Home} />
         <Route path="/drinks" component={Drinks} />
         <Route path="/about" component={About} />
-        <Route path="/shots" component={Shots} />
         <Route path="/cocktail/:id" component={Ingredients} />
         <Route path="/search=:id" component={Search} />
         <Route path='/login' component={Login} onGreet={this.props.onGreet} />

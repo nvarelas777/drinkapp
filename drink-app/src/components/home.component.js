@@ -128,6 +128,7 @@ const TableBody = styled.tbody`
 const ThBodyHeaderStyle = styled.th`
     font-size: 20px;
     text-align: center;
+    text-decoration: underline;
 `;
 
 const ContainerTableStyle = styled(Container)`

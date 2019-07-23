@@ -10,9 +10,8 @@ export default class Footer extends Component {
     render() {
         return (
             <ContainerStyled>
-                <h1>test</h1>
                 <Navbar>
-                    <NavLink to='/login' className="nav-link" >Login</NavLink>
+                    <NavLinkStyled  to='/login' className="nav-link" >Login</NavLinkStyled >
                 </Navbar>
                 <Route path='/login' component={Login} />
             </ContainerStyled>
@@ -25,3 +24,12 @@ const ContainerStyled = styled(Container)`
     padding-top:0;
     margin-top: 0;
 `;
+
+const NavLinkStyled = styled(NavLink)`
+  color: black;
+  font-weight: bold;
+  padding-left:.6em;
+  padding-right:.6em;
+  padding-top:.3em;
+  font-family: Arial, Helvetica, sans-serif;
+`

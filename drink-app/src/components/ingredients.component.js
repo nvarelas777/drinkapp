@@ -49,7 +49,6 @@ export default class Ingredients extends Component {
     async componentDidMount() {
         this.mounted = true;
         
-
         const [firstRes, secondRes] = await Promise.all([
             axios.get('http://localhost:4000/byid/' + this.props.match.params.id),
             axios.get('http://localhost:4000/')
@@ -92,23 +91,33 @@ export default class Ingredients extends Component {
     render() {
         return (
             <Container>
-                <h1>{this.state.drink_name}</h1>
+                <Row>
+                    <Col>
+                        <DrinkNameStyled >{this.state.drink_name}</DrinkNameStyled>
+                    </Col>
+                </Row>
                 <Row>
                     <Col lg={8}>
                         <Row>
-                            <Col sm={6} xs={6}>
-                                <h3>Ingredients</h3>
-                                <p>{this.renderIngredients()}</p>
+                            <Col sm={6} xs={12}>
+                                <InfoContainer>
+                                    <H3Styled>Ingredients</H3Styled>
+                                    <p>{this.renderIngredients()}</p>
+                                </InfoContainer>
                             </Col>
-                            <Col sm={6} xs={6}>
-                                <h3>Special Instructions</h3>
-                                <p>{this.state.drink_special_instructions}</p>
+                            <Col sm={6} xs={12}>
+                                <InfoContainer>
+                                    <H3Styled>Special Instructions</H3Styled>
+                                    <p>{this.state.drink_special_instructions}</p>
+                                </InfoContainer>
                             </Col>
                         </Row>
                         <Row>
                             <Col sm={6}>
-                                <h3>Glass Type</h3>
-                                <p>{this.state.drink_glass}</p>
+                                <InfoContainer>
+                                    <H3Styled>Glass Type</H3Styled>
+                                    <p>{this.state.drink_glass}</p>
+                                </InfoContainer>
                             </Col>
                         </Row>
                     </Col>
@@ -140,6 +149,17 @@ export default class Ingredients extends Component {
     }
 }
 
+const DrinkNameStyled = styled.h1`
+text-align:center;
+margin-bottom: 25px;
+font-size:50px;
+color: #ff6655;
+`
+
+const H3Styled = styled.h3`
+font-size:2em;
+font-weight: bold
+`
 
 const TableBodyStyled = styled.tbody`
     background-color: #abeaff;
@@ -152,4 +172,14 @@ const TableRowStyled = styled.tr`
 
 const TableRowHeadStyled = styled.tr`
     border-bottom: 2px solid black;
+    font-size: 2em;
 `;
+
+const InfoContainer = styled(Container)`
+background-color: #abeaff;
+padding-left: 20px;
+padding-bottom: 10px;
+padding-top: 10px;
+border-radius: 8px;
+margin-bottom: 10px;
+`

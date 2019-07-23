@@ -175,15 +175,15 @@ export default class DrinkAdminAdd extends Component {
         return (
             <ContainerStyled>
                 <Col lg={this.props.setParams === undefined ? { offset: 3, span: 6 } : this.props.setParams}>
-                    <Alert variant="warning">New cocktails will need admin approval before being visible.</Alert>
+                    <AlertStyled variant="warning">New cocktails will need admin approval before being visible.</AlertStyled>
                 <Row>
                     <Col sm={12}>
-                        <Alert variant="success" show={this.state.alert_successful}>
+                        <AlertStyled variant="success" show={this.state.alert_successful}>
                         Drink Successfully Added!
-                        </Alert>
-                        <Alert variant="danger" show={this.state.alert_unsuccessful}>
+                        </AlertStyled>
+                        <AlertStyled variant="danger" show={this.state.alert_unsuccessful}>
                             Drink Not Added!
-                        </Alert>
+                        </AlertStyled>
                     </Col>
                 </Row>
                     <FormStyled>
@@ -219,8 +219,10 @@ export default class DrinkAdminAdd extends Component {
                             <Form.Label>Glass Type</Form.Label>
                             <DropdownButton onSelect={this.glassType} title={this.state.dropDownValue}>
                                 <Dropdown.Item eventKey="Shot"><div onClick={(e) => this.changeValue(e.target.textContent)}>Shot</div></Dropdown.Item>
-                                <Dropdown.Item eventKey="Rocks/Shooter"><div onClick={(e) => this.changeValue(e.target.textContent)}>Rocks/Shooter</div></Dropdown.Item>
+                                <Dropdown.Item eventKey="Rocks"><div onClick={(e) => this.changeValue(e.target.textContent)}>Rocks</div></Dropdown.Item>
                                 <Dropdown.Item eventKey="Bomb"><div onClick={(e) => this.changeValue(e.target.textContent)}>Bomb</div></Dropdown.Item>
+                                <Dropdown.Item eventKey="Hurricane"><div onClick={(e) => this.changeValue(e.target.textContent)}>Hurricane</div></Dropdown.Item>
+                                <Dropdown.Item eventKey="Highball"><div onClick={(e) => this.changeValue(e.target.textContent)}>Highball</div></Dropdown.Item>
                             </DropdownButton>
                         </FormGroupStyled>
                         <Form.Group>
@@ -243,6 +245,7 @@ padding-bottom: 2em;
 const FormGroupStyled = styled(Form.Group)`
 padding-bottom: 1em;
 border-bottom: 1px solid grey;
+font-weight: bold;
 `
 
 const FormStyled = styled(Form)`
@@ -250,8 +253,13 @@ border: 2px solid black;
 padding: 1em;
 background-color: #abeaff;
 border-radius:8px;
+font-weight: bold;
 `;
 
 const DivSubmitStyled = styled.div`
 text-align:center;
 `;
+
+const AlertStyled = styled(Alert)`
+font-weight: bold;
+color:black;`

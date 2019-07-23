@@ -12,6 +12,7 @@ import Button from 'react-bootstrap/Button'
 import styled from 'styled-components'
 import Pagination from 'react-bootstrap/Pagination'
 import Form from 'react-bootstrap/Form';
+import Login from './login.component';
 
 const Drink = props => (
     <TableRowStyled>
@@ -156,7 +157,8 @@ export default class DrinkAdmin extends Component {
         if (this.state.isAuth === 'false') {
             return (
                 <Container>
-                    <h3>Please login to continue...</h3>
+                    <WarningStyled>Please login to continue...</WarningStyled>
+                    <Login />
                 </Container>
             )
         }
@@ -259,4 +261,9 @@ padding-bottom:1em;
 const TableRowStyled = styled.tr`
 font-size: 18px;
 font-weight: bold;
+`
+
+const WarningStyled = styled.h3`
+text-align: center;
+margin-bottom: 20px;
 `

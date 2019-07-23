@@ -177,6 +177,7 @@ margin-top: 10px;
 
 const TableRowHeadStyled =  styled.tr`
     font-size: 20px;
+    text-decoration: underline;
 `;
 
 const TableRowStyled = styled.tr`
