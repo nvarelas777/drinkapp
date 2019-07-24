@@ -14,13 +14,13 @@ app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
 app.use(bodyParser.json());
 //const drinkRoutes = express.Router();
 
-if(process.env.NODE_ENV === 'production'){
-    app.use(express.static('drink-app/build'));
+// if(process.env.NODE_ENV === 'production'){
+//     app.use(express.static('drink-app/build'));
 
-    app.get('*', (req, res) => {
-        res.sendFile(path.resolve('drink-app', 'client', 'build', 'index.html'));
-    });
-}
+//     app.get('*', (req, res) => {
+//         res.sendFile(path.resolve('drink-app', 'client', 'build', 'index.html'));
+//     });
+// }
 
 //var models = require('./Schema');
 var Drink  = require('./Schema');
