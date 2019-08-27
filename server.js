@@ -1,3 +1,6 @@
+require('babel-register')({
+    presets: [ 'es2015', 'react' ]
+ });
 const mongoose = require('mongoose');
 const cors = require('cors');
 const express = require('express');
@@ -11,9 +14,9 @@ require('dotenv').config();
 const secret = process.env.DB_TOKEN;
 const withAuth = require('./middleware');
 app.use(cookieParser());
-//app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
+app.use(cors());
 app.use(bodyParser.json());
-//const drinkRoutes = express.Router();
+const drinkRoutes = express.Router();
 
 // if(process.env.NODE_ENV === 'production'){
 //     app.use(express.static('drink-app/build'));
@@ -27,14 +30,14 @@ app.use(bodyParser.json());
 
 app.use(express.static(path.join(__dirname, 'drink-app/build')));
 
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname+'/drink-app/build/index.html'));
-  });
+// app.get('*', (req, res) => {
+//     res.sendFile(path.join(__dirname+'/drink-app/build/index.html'));
+//   });
 
 var Drink  = require('./Schema');
 var User = require('./models/users');
 
-//app.use('/drinks', drinkRoutes);
+app.use('/drinks', drinkRoutes);
 
 var uri = process.env.MONGO_URI;
 
